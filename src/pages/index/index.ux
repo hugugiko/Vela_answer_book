@@ -1,0 +1,204 @@
+<template>
+  <div class="index-page">
+    <div class="head">
+      <input class="back" type="button" value="返回" @click="back" />
+      <div class="tt">
+        <text class="times">{{timeNow}}</text>
+        <text class="title">答案之书</text>
+      </div>
+      <input class="more" type="button" value="关于" @click="toinfo" />
+    </div>
+    <div class="mainI">
+      <text class="bookI">{{O_book}}</text>
+    </div>
+    <div class="openflex">
+      <input class="open" type="button" value="翻开书本" @click="openbook" />
+    </div>
+  </div>
+</template>
+
+<script>
+  import router from "@system.router"
+  import configuration from "@system.configuration"
+  import brightness from '@system.brightness'
+  import vibrator from '@system.vibrator' 
+  import prompt from '@system.prompt'
+  import app from '@system.app' 
+  
+  
+  const answerBook = [
+    // 行动决策建议（40条）
+    "放手一搏", "值得一试", "保持现状", "另辟蹊径", "制定新计划", "主动一点", "相信直觉", "需要妥协", 
+    "跟随趋势", "现在正是时候", "勇于尝试", "及时止损", "倾听内心", "专注当下", "循序渐进", "保持开放", 
+    "等待时机", "拥抱变化", "简化选择", "信任伙伴", "保持冷静", "调整心态", "强化执行力", "明确优先级", 
+    "善用现有资源", "保持学习力", "保持灵活性", "保持专注力", "保持适应性", "保持问题导向", "保持成长型思维", 
+    "保持创新意识", "学会拒绝", "学会断舍离", "学会换位思考", "突破舒适区", "控制期望值", "检验可行性", "把握临界点", 
+    "避免盲目跟风", "避免急功近利",
+
+    // 策略方法建议（40条）
+    "不必纠结", "静观其变", "你需要帮助", "保持耐心", "注意细节", "重新考虑途径", "需权衡利弊", "需保持谦逊", 
+    "勿急于求成", "退一步看", "细节决定成败", "方向比速度重要", "别否定自己", "别低估自己", "答案在你手中", 
+    "接纳不完美", "积累小进步", "关注核心目标", "保持幽默感", "避免过度承诺", "保持独立性", "避免自我设限", 
+    "保持同理心", "保持批判性", "保持务实态度", "避免零和思维", "保持开放性", "避免非黑即白", "保持适度距离", 
+    "重视个人空间", "保持积极暗示", "避免抱怨指责", "避免路径依赖", "突破常规思维", "强化问题意识", 
+    "重视协同效应", "保持战略定力", "优化资源配置", "强化风险意识", "提升执行效率",
+
+    // 心态平衡建议（40条）
+    "这将值得纪念", "珍惜眼前人", "沉默是金", "聚焦关键关系", "保持真诚", "避免过度消耗", "保持边界感", 
+    "平衡工作与生活", "避免过度比较", "重视自我表达", "拥抱多样性", "保持节奏感", "保持初心", "避免自我否定", 
+    "保持积极暗示", "重视自我关怀", "保持心理弹性", "强化自我认同", "接纳发展节奏", "保持内心平静", 
+    "重视内在秩序", "保持认知平衡", "强化价值判断", "保持决策理性", "重视情绪管理", "强化自我调节", 
+    "保持心理边界", "重视精神留白", "保持观察视角", "强化全局思维", "保持战略耐心", "重视长期主义", 
+    "避免心态失衡", "避免过度卷入", "避免短视行为", "强化目标导向", "保持行动一致性", "重视习惯养成", 
+    "强化自我觉察", "保持情绪稳定", "重视身心合一"
+  ];
+
+  function fixLength(num) {//时间长度转换
+    num = String(num)
+    if (num <= 9 && num >= 0) return "0" + num
+    else return num
+  }
+
+  function getRandomAnswer(Abook) {
+    const randomIndex = Math.floor(Math.random() * Abook.length);
+    return Abook[randomIndex];
+  }
+
+  function timerupdate(obj){
+    setInterval(() => {
+      let date = new Date()
+      obj.timeNow = fixLength(date.getHours()) + ":" + fixLength(date.getMinutes())
+      //console.log("获取时间")
+    }, 3000);
+  }
+
+  var IsS = false
+
+  function getans(obj){
+    if(IsS == false){
+        IsS = true
+        prompt.showToast({
+          message: '请默念出问题5s后会给出答案',
+          duration: 5000
+        })
+        setTimeout(() => {
+          if(IsS == true)vibrator.vibrate({
+            mode: 'long'
+          })
+          obj.O_book = getRandomAnswer(answerBook)
+          IsS = false
+        }, 5000)
+      }
+  }
+  export default {
+    public: {
+      timeNow: "null",//现在时间
+      O_book: "等待翻开",
+      timer: null
+    },
+    toinfo (){
+      router.replace({
+        uri: 'pages/about',
+      })
+    },
+    back (){
+      app.terminate()
+    },
+    openbook (){
+      getans(this)
+    },
+    onInit() {
+      //初始化时间
+      let date = new Date()
+      this.timeNow = fixLength(date.getHours()) + ":" + fixLength(date.getMinutes())
+      timerupdate(this)
+    },
+    onReady(){
+      brightness.setKeepScreenOn({
+        keepScreenOn: true,
+        success: function() {
+          console.log('handling success')
+        },
+        fail: function(data, code) {
+          console.log(`handling fail, code = ${code}`)
+        }
+      })
+    }
+  }
+</script>
+
+<style>
+  .index-page{
+    align-items: center;
+    box-sizing: border-box;
+    flex-direction: column;
+    width: 336px;
+    height: 480px;
+    opacity: 1;
+    border-radius: 48px;
+    background-color: #000000;
+  }
+  /* head */
+  .head{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  .back{
+    background-color: rgba(38, 38, 38, 1);
+    color: white;
+    margin: 16vw;
+    width: 110vw;
+    opacity: 1;
+  }
+  .tt{
+    margin-top: 10px;
+    flex-direction: column;
+  }
+  .times{
+    font-size: 32px;
+    letter-spacing: 0px;
+    line-height: 33.6px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    vertical-align: top;
+  }
+  .title{
+    font-size: 42px;
+    letter-spacing: 0px;
+    line-height: 44.8px;
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+    vertical-align: top;
+  }
+  .more{
+    background-color: rgba(38, 38, 38, 1);
+    color: white;
+    margin: 16vw;
+    width: 110vw;
+    opacity: 1;
+  }
+  /* body */
+  .mainI{
+    width: 92%;
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 120px;
+    padding-bottom: 120px;
+    flex-direction: column;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 36px;
+  }
+  .bookI{
+    text-align: center;
+  }
+  .open{
+    background-color: rgba(38, 38, 38, 1);
+    color: white;
+    margin: 16vw;
+    width: 200vw;
+    height: 100vh;
+    opacity: 1;
+  }
+</style>
