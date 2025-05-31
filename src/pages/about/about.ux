@@ -1,0 +1,129 @@
+<template>
+  <div class="index-page">
+    <div class="head">
+      <input class="back" type="button" value="返回" @click="back" />
+      <div class="tt">
+        <text class="times">{{timeNow}}</text>
+        <text class="title">答案之书</text>
+      </div>
+      <text class="nullclass"></text>
+    </div>
+    <image class="im" src="/common/about.png" />
+    <div class="about">
+      <text class="about_title">简介</text>
+      <text style="color: white;">这只不过是一个普普通通的答案之书</text>
+      <text style="color: white;">内容由豆包生成</text>
+      <text style="color: white;">这是我开发的第一个应用可能有不足请谅解</text>
+      <text class="about_title">开发者</text>
+      <text style="color: white;">@hugugiko</text>
+      <text style="color: white;">bandbbs/@hu_gugiko</text>
+      <text class="about_title">Github开源地址</text>
+      <text style="color: white;">https://github.com/hugugiko/Vela_answer_book/</text>
+      <text></text>
+    </div>
+  </div>
+</template>
+
+<script>
+  import router from "@system.router"
+
+  function fixLength(num) {//时间长度转换
+    num = String(num)
+    if (num <= 9 && num >= 0) return "0" + num
+    else return num
+  }
+  
+  function timerupdate(obj){
+    setInterval(() => {
+      let date = new Date()
+      obj.timeNow = fixLength(date.getHours()) + ":" + fixLength(date.getMinutes())
+      //console.log("获取时间")
+    }, 3000);
+  }
+  
+  export default {
+    public: {
+      timeNow: "null"//现在时间
+    },
+    back (){
+      router.replace({
+        uri: 'pages/index',
+      })
+    },
+    onInit() {
+      //初始化时间
+      let date = new Date()
+      this.timeNow = fixLength(date.getHours()) + ":" + fixLength(date.getMinutes())
+      timerupdate(this)
+    }
+  }
+</script>
+
+<style>
+  .index-page{
+    flex-direction: column;
+    width: 336px;
+    height: 480px;
+    opacity: 1;
+    border-radius: 48px;
+    background-color: #000000;
+  }
+  /* head */
+  .head{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  .back{
+    background-color: rgba(38, 38, 38, 1);
+    color: white;
+    margin: 16vw;
+    width: 110vw;
+    opacity: 1;
+  }
+  .tt{
+    margin-top: 10px;
+    flex-direction: column;
+  }
+  .times{
+    font-size: 32px;
+    letter-spacing: 0px;
+    line-height: 33.6px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    vertical-align: top;
+  }
+  .title{
+    font-size: 42px;
+    letter-spacing: 0px;
+    line-height: 44.8px;
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+    vertical-align: top;
+  }
+  .more{
+    background-color: rgba(38, 38, 38, 1);
+    color: white;
+    margin: 16vw;
+    width: 110vw;
+    opacity: 1;
+  }
+  .nullclass{
+    width: 142vw;
+  }
+  .im{
+    margin: 16vw;
+    width: 450vw;
+  }
+  .about{
+    flex-direction: column;
+    margin: 16vw;
+  }
+  .about_title{
+    font-size: 48px;
+    line-height: 44.8px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: left;
+    vertical-align: top;
+  }
+</style>
